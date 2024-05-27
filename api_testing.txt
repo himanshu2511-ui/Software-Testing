@@ -1,0 +1,62 @@
+pip install selenium
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+import time
+# Path to the ChromeDriver executable
+chrome_driver_path = "/path/to/chromedriver"  # Update this path
+
+# Set up the WebDriver
+service = Service(chrome_driver_path)
+driver = webdriver.Chrome(service=service)
+def test_login():
+    try:
+        # Open the target web application
+        driver.get("https://example.com/login")  # Update this URL to your target application
+
+        # Maximize the browser window
+        driver.maximize_window()
+
+        # Locate the username field and enter a username
+        username_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "username"))
+        )
+        username_field.clear()
+        username_field.send_keys("your_username")  # Replace with a valid username
+
+        # Locate the password field and enter a password
+        password_field = driver.find_element(By.ID, "password")
+        password_field.clear()
+        password_field.send_keys("your_password")  # Replace with a valid password
+
+        # Locate the login button and click it
+        login_button = driver.find_element(By.ID, "loginButton")
+        login_button.click()
+
+        # Wait for a specific element to appear on the home page
+        home_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "homeElement"))  # Update this to a valid element on the home page
+        )
+
+        # Verify the login was successful
+        assert home_element.is_displayed(), "Login failed: Home element not displayed."
+
+        print("Login test passed.")
+
+    except TimeoutException:
+        print("Login test failed: Element not found within the timeout period.")
+    except AssertionError as e:
+        print(e)
+    finally:
+        # Close the browser
+        driver.quit()
+
+# Run the test
+if __name__ == "__main__":
+    test_login()

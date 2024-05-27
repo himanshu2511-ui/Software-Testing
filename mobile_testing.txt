@@ -1,0 +1,59 @@
+pip install Appium-Python-Client
+npm install -g appium
+from appium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+import time
+desired_caps = {
+    "platformName": "Android",
+    "platformVersion": "11.0",  # Update this to your Android version
+    "deviceName": "emulator-5554",  # Update this to your device name or emulator ID
+    "app": "/path/to/your/app.apk",  # Path to your mobile app .apk file
+    "automationName": "UiAutomator2",  # Recommended for Android
+}
+
+# Initialize the Appium driver
+driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_caps)
+def test_login():
+    try:
+        # Wait for the login screen to be displayed
+        username_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "com.example.app:id/username"))
+        )
+        
+        # Enter username
+        username_field.clear()
+        username_field.send_keys("your_username")  # Replace with a valid username
+
+        # Enter password
+        password_field = driver.find_element(By.ID, "com.example.app:id/password")
+        password_field.clear()
+        password_field.send_keys("your_password")  # Replace with a valid password
+
+        # Click login button
+        login_button = driver.find_element(By.ID, "com.example.app:id/loginButton")
+        login_button.click()
+
+        # Wait for the home screen to be displayed
+        home_element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "com.example.app:id/homeElement"))  # Update to a valid element ID
+        )
+
+        # Verify the login was successful
+        assert home_element.is_displayed(), "Login failed: Home element not displayed."
+
+        print("Login test passed.")
+
+    except TimeoutException:
+        print("Login test failed: Element not found within the timeout period.")
+    except AssertionError as e:
+        print(e)
+    finally:
+        # Close the app
+        driver.quit()
+
+# Run the test
+if __name__ == "__main__":
+    test_login()
